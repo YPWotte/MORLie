@@ -176,7 +176,7 @@ for k = 1:L
             XCand_j = reshape(S_red_kNN(:,IndCand_j),[NCand_j*3,1]);        
             dXCand_j = reshape(Sp_red_kNN(:,IndCand_j),[NCand_j*3,1]);      
             rho_Data_Inf((nr-1)*dim_G+1:nr*dim_G,ind) = ...
-                pinv(JacPhiGL(X_loc))*dX_loc/dt; 
+                pinv(JacPhiGL(XCand_j))*dXCand_j/dt; 
             
             IndCand_k = IndCand_k + IndCand_j/(M-1);                        % Average association of points with candidate cluster (close to 1 for points that are often in the cluster)
         end
