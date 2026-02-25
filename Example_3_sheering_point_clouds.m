@@ -1,11 +1,11 @@
-%% Initialized with 2 rigid point clouds. Algorithm itself is able to handle arbitrary amounts.
+%% Algorithm initialized with 2 sheering point clouds, but is able to handle arbitrary amounts.
 
 
 %% 0. Setup
 addpath(genpath('./Auxilliary'));
 
 rng(1);                                                                     % Random seed
-NR = 1;                                                                     % Number of rigid bodies
+NR = 2;                                                                     % Number of rigid bodies
 N = 100;                                                                    % Number of points per rigid body
 Np = N*NR;                                                                  % Total number of points
 M = 1000;                                                                   % Number of time-instances per trajectory
@@ -606,15 +606,15 @@ for j = 2:M
     Sk_chip_fin (:,j) = PhiG(G_chip_fin(dt*(j-1)),Sk_chip_fin(:,1),Ind_k_fin);
 end
 
-% 2.4 Errors (try arbitrary initial data not in testset?)
-p_norm = inf;
+% 2.4 Errors: average particle distance 
+p_norm = 2;
 % 2.4.1 Over whole trajectory: 
 Sk_GT = S_GT(:,(k-1)*M+1:k*M);
 % Ett_param = vecnorm(Sk_param - Sk_GT,norm);
-Ett_spline = vecnorm(Sk_spline - Sk_GT,p_norm);
-Ett_chip = vecnorm(Sk_chip - Sk_GT,p_norm);
-Ett_spline_fin = vecnorm(Sk_spline_fin - Sk_GT,p_norm);
-Ett_chip_fin = vecnorm(Sk_chip_fin - Sk_GT,p_norm);
+Ett_spline = dist(Sk_spline,Sk_GT,p_norm); 
+Ett_chip = dist(Sk_chip,Sk_GT,p_norm); 
+Ett_spline_fin = dist(Sk_spline_fin,Sk_GT,p_norm);
+Ett_chip_fin = dist(Sk_chip_fin,Sk_GT,p_norm); 
 
 % 2.4.2 Between successive points:
 % Esp_param = zeros(M-2,1);
@@ -624,10 +624,10 @@ Esp_spline_fin = zeros(M-2,1);
 Esp_chip_fin = zeros(M-2,1);
 for j = 2:M
     % Esp_param(j-1) = vecnorm(PhiG(expgl(dt*rho_param((j-2)*dt)),Sk_GT(:,j-1),IndCand_k) - Sk_GT(:,j),norm);
-    Esp_spline(j-1) = vecnorm(PhiG(expG(dt*rho_fit_spline_smooth((j-2)*dt),dim_G),Sk_GT(:,j-1),Ind_k_inf) - Sk_GT(:,j),p_norm);
-    Esp_chip(j-1) = vecnorm(PhiG(expG(dt*rho_chips((j-2)*dt),dim_G),Sk_GT(:,j-1),Ind_k_inf) - Sk_GT(:,j),p_norm);
-    Esp_spline_fin(j-1) = vecnorm(PhiG(expG(dt*rho_fit_spline_smooth_fin((j-2)*dt),dim_G),Sk_GT(:,j-1),Ind_k_fin) - Sk_GT(:,j),p_norm);
-    Esp_chip_fin(j-1) = vecnorm(PhiG(expG(dt*rho_chips_fin((j-2)*dt),dim_G),Sk_GT(:,j-1),Ind_k_fin) - Sk_GT(:,j),p_norm);
+    Esp_spline(j-1) = dist(PhiG(expG(dt*rho_fit_spline_smooth((j-2)*dt),dim_G),Sk_GT(:,j-1),Ind_k_inf), Sk_GT(:,j),p_norm); 
+    Esp_chip(j-1) = dist(PhiG(expG(dt*rho_chips((j-2)*dt),dim_G),Sk_GT(:,j-1),Ind_k_inf), Sk_GT(:,j),p_norm); 
+    Esp_spline_fin(j-1) = dist(PhiG(expG(dt*rho_fit_spline_smooth_fin((j-2)*dt),dim_G),Sk_GT(:,j-1),Ind_k_fin), Sk_GT(:,j),p_norm); 
+    Esp_chip_fin(j-1) = dist(PhiG(expG(dt*rho_chips_fin((j-2)*dt),dim_G),Sk_GT(:,j-1),Ind_k_fin), Sk_GT(:,j),p_norm); 
 end
 
 TimeReconstruct = toc(TimeReconstruct);
